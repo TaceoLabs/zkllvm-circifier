@@ -27,6 +27,13 @@ inline llvm::GaloisFieldKind GetBaseFieldKind(EllipticCurveKind CurveKind) {
 
 unsigned GetNumberBits(GaloisFieldKind Kind);
 unsigned GetNumberBits(EllipticCurveKind Kind);
+
+enum ZkFixedPointKind : unsigned {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId) EnumId,
+#include "llvm/IR/ZkFixedPointTypes.def"
+};
+
+unsigned GetNumberBits(ZkFixedPointKind Kind);
 } // namespace llvm
 
 #endif // LLVM_ZK_ZK_ENUMS_H

@@ -160,6 +160,7 @@ typedef enum {
   LLVMIntegerTypeKind,   /**< Arbitrary bit width integers */
   LLVMGaloisFieldTypeKind,
   LLVMEllipticCurveTypeKind,
+  LLVMZkFixedPointTypeKind,
   LLVMFunctionTypeKind,  /**< Functions */
   LLVMStructTypeKind,    /**< Structures */
   LLVMArrayTypeKind,     /**< Arrays */

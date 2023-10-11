@@ -366,6 +366,18 @@ EllipticCurveType *EllipticCurveType::get(LLVMContext &C, EllipticCurveKind Kind
   }
 }
 
+//===----------------------------------------------------------------------===//
+//                       ZkFixedPointType Implementation
+//===----------------------------------------------------------------------===//
+
+ZkFixedPointType *ZkFixedPointType::get(LLVMContext &C, ZkFixedPointKind Kind) {
+  switch (Kind) {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)               \
+  case EnumId:                                                                 \
+    return &C.pImpl->SingletonId;
+#include "llvm/IR/ZkFixedPointTypes.def"
+  }
+}
 
 //===----------------------------------------------------------------------===//
 //                       FunctionType Implementation

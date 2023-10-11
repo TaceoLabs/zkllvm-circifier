@@ -702,6 +702,10 @@ inline TypeSize DataLayout::getTypeSizeInBits(Type *Ty) const {
     unsigned BaseByteSize = (BaseBitWidth + 7) / 8;
     return TypeSize::Fixed(BaseByteSize * 8 * 2);
   }
+  case Type::ZkFixedPointTyID: {
+    unsigned ByteSize = (cast<ZkFixedPointType>(Ty)->getBitWidth() + 7) / 8;
+    return TypeSize::Fixed(ByteSize * 8);
+  }
   case Type::HalfTyID:
   case Type::BFloatTyID:
     return TypeSize::Fixed(16);

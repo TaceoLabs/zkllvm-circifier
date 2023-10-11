@@ -567,6 +567,14 @@ void TypePrinting::print(Type *Ty, raw_ostream &OS) {
       return;
 #include "llvm/IR/EllipticCurveTypes.def"
     }
+  case Type::ZkFixedPointTyID:
+    switch (cast<ZkFixedPointType>(Ty)->getFixedKind()) {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  case EnumId:                                                                 \
+    OS << Name;                                                                \
+    return;
+#include "llvm/IR/ZkFixedPointTypes.def"
+    }
 
   case Type::FunctionTyID: {
     FunctionType *FTy = cast<FunctionType>(Ty);

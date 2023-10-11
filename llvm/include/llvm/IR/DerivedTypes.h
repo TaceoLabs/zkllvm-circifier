@@ -166,6 +166,29 @@ public:
   }
 };
 
+/// Class to represent Zk Fixed Point types.
+class ZkFixedPointType : public Type {
+  friend class LLVMContextImpl;
+
+protected:
+  explicit ZkFixedPointType(LLVMContext &C, ZkFixedPointKind Kind) : Type(C, ZkFixedPointTyID){
+    setSubclassData(Kind);
+  }
+
+public:
+  /// Get an ZkFixedPointType instance.
+  static ZkFixedPointType *get(LLVMContext &C, ZkFixedPointKind Kind);
+
+  /// Get the kind of fixed point type
+  ZkFixedPointKind getFixedKind() const { return static_cast<ZkFixedPointKind>(getSubclassData()); }
+
+  unsigned getBitWidth() const;
+
+  /// Methods for support type inquiry through isa, cast, and dyn_cast.
+  static bool classof(const Type *T) {
+    return T->getTypeID() == ZkFixedPointTyID;
+  }
+};
 
 /// Class to represent function types
 ///

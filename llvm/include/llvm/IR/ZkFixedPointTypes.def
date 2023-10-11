@@ -1,0 +1,28 @@
+//= llvm/ZkFixedPoint.def - File that describes ZkFixedPoint -*- C++ -=//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file contains the list of Zk Fixed Point Defs.
+// Use this macros to handle the elements:
+//
+// ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)
+//
+//===----------------------------------------------------------------------===//
+
+// NOTE: NO INCLUDE GUARD DESIRED!
+
+// Provide definitions of macros so that users of this file do not have to
+// define everything to use it...
+//
+
+#ifndef ZK_FIXED_POINT_TYPE
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)
+#endif
+
+ZK_FIXED_POINT_TYPE("__zkllvm_fixed1616", ZK_FIXED_POINT_16_16, ZkFixedPoint1616Ty, FZkFixedPoint1616)
+
+#undef ZK_FIXED_POINT_TYPE

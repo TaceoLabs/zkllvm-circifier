@@ -53,6 +53,9 @@ LLVMContextImpl::LLVMContextImpl(LLVMContext &C)
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId)  \
       ,SingletonId(C, EnumId)
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  , SingletonId(C, EnumId)
+#include "llvm/IR/ZkFixedPointTypes.def"
   {
   if (OpaquePointersCL.getNumOccurrences()) {
     OpaquePointers = OpaquePointersCL;

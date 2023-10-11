@@ -180,6 +180,7 @@ enum TypeCodes {
 
   TYPE_CODE_GALOIS_FIELD = 27, // GALOIS_FIELD: [kind]
   TYPE_CODE_ELLIPTIC_CURVE = 28, // ELLIPTIC_CURVE: [kind]
+  TYPE_CODE_ZK_FIXED_POINT = 29, // ZK_FIXED_POINT: [kind]
 };
 
 enum OperandBundleTagCode {

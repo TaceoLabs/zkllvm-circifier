@@ -29,6 +29,7 @@ namespace llvm {
 class IntegerType;
 class GaloisFieldType;
 class EllipticCurveType;
+class ZkFixedPointType;
 struct fltSemantics;
 class LLVMContext;
 class PointerType;
@@ -73,6 +74,7 @@ public:
     IntegerTyID,        ///< Arbitrary bit width integers
     GaloisFieldTyID,    ///< Galois field elements
     EllipticCurveTyID,  ///< Elliptic curve elements
+    ZkFixedPointTyID,   ///< Zk Fixed Point elements
     FunctionTyID,       ///< Functions
     PointerTyID,        ///< Pointers
     StructTyID,         ///< Structures
@@ -249,6 +251,9 @@ public:
   /// True if this is an instance of EllipticCurveType.
   bool isCurveTy() const { return getTypeID() == EllipticCurveTyID; }
 
+  /// True if this is an instance of ZkFixedPointType.
+  bool isZkFixedPointTy() const { return getTypeID() == ZkFixedPointTyID; }
+
   /// Return true if this is an field type or a vector of field types.
   bool isFieldOrFieldVectorTy() const {
     return getScalarType()->isFieldTy();
@@ -298,7 +303,7 @@ public:
   bool isSingleValueType() const {
     return isFloatingPointTy() || isX86_MMXTy() || isIntegerTy() ||
            isPointerTy() || isVectorTy() || isX86_AMXTy() || isTargetExtTy() || isFieldTy() ||
-           isCurveTy();
+           isCurveTy() || isZkFixedPointTy();
   }
 
   /// Return true if the type is an aggregate type. This means it is valid as
@@ -316,7 +321,7 @@ public:
     if (getTypeID() == IntegerTyID || isFloatingPointTy() ||
         getTypeID() == PointerTyID || getTypeID() == X86_MMXTyID ||
         getTypeID() == X86_AMXTyID || getTypeID() == GaloisFieldTyID ||
-        getTypeID() == EllipticCurveTyID)
+        getTypeID() == EllipticCurveTyID || getTypeID() == ZkFixedPointTyID)
       return true;
     // If it is not something that can have a size (e.g. a function or label),
     // it doesn't have a size.

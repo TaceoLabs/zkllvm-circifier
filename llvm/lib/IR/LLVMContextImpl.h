@@ -1526,6 +1526,9 @@ public:
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId)             \
   EllipticCurveType SingletonId;
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  ZkFixedPointType SingletonId;
+#include "llvm/IR/ZkFixedPointTypes.def"
 
   std::unique_ptr<ConstantTokenNone> TheNoneToken;
 

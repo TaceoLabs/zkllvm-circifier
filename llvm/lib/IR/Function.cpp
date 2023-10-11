@@ -978,6 +978,16 @@ static std::string getMangledTypeStr(Type *Ty, bool &HasUnnamedType) {
         }
         break;
       }
+    case Type::ZkFixedPointTyID: {
+      switch (cast<ZkFixedPointType>(Ty)->getFixedKind()) {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  case ZkFixedPointKind::EnumId:                                               \
+    Result += Name;                                                            \
+    break;
+#include "llvm/IR/ZkFixedPointTypes.def"
+      }
+      break;
+    }
     }
 
   }

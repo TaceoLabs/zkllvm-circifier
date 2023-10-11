@@ -994,6 +994,11 @@ void ModuleBitcodeWriter::writeTypeTable() {
       Code = bitc::TYPE_CODE_ELLIPTIC_CURVE;
       TypeVals.push_back(cast<EllipticCurveType>(T)->getCurveKind());
       break;
+    case Type::ZkFixedPointTyID:
+      // ZkFixedPoint: [kind]
+      Code = bitc::TYPE_CODE_ZK_FIXED_POINT;
+      TypeVals.push_back(cast<ZkFixedPointType>(T)->getFixedKind());
+      break;
     case Type::PointerTyID: {
       PointerType *PTy = cast<PointerType>(T);
       unsigned AddressSpace = PTy->getAddressSpace();

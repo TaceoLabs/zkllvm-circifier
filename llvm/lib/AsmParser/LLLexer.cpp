@@ -816,6 +816,10 @@ lltok::Kind LLLexer::LexIdentifier() {
   TYPEKEYWORD(Name, EllipticCurveType::get(Context, EnumId));
 #include "llvm/IR/EllipticCurveTypes.def"
 
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  TYPEKEYWORD(Name, ZkFixedPointType::get(Context, EnumId));
+#include "llvm/IR/ZkFixedPointTypes.def"
+
   if (Keyword == "ptr") {
     if (Context.supportsTypedPointers()) {
       Warning("ptr type is only supported in -opaque-pointers mode");
