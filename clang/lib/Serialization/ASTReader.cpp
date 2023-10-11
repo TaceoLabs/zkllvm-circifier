@@ -7188,7 +7188,7 @@ QualType ASTReader::GetType(TypeID ID) {
       T = Context.SingletonId; \
       break;
 #include "llvm/IR/EllipticCurveTypes.def"
-#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)                                   \
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)                                   \
   case PREDEF_TYPE_##Id##_ID:                                                  \
     T = Context.SingletonId;                                                   \
     break;
