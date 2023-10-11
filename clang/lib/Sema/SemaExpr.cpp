@@ -6595,6 +6595,8 @@ static bool isPlaceholderToRemoveAsArg(QualType type) {
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   case BuiltinType::FrontendId:
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
     return false;
 
   // We cannot lower out overload sets; they might validly be resolved
@@ -21162,6 +21164,8 @@ ExprResult Sema::CheckPlaceholderExpr(Expr *E) {
 #include "clang/Basic/FieldTypes.def"
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   case BuiltinType::FrontendId:
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
 #include "llvm/IR/EllipticCurveTypes.def"
 #define BUILTIN_TYPE(Id, SingletonId) case BuiltinType::Id:
 #define PLACEHOLDER_TYPE(Id, SingletonId)

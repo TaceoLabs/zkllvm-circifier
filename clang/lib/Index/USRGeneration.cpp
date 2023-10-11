@@ -746,6 +746,11 @@ void USRGenerator::VisitType(QualType T) {
 #include "clang/Basic/RISCVVTypes.def"
 #define FIELD_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/FieldTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)                                   \
+  case BuiltinType::Id:                                                        \
+    Out << "@BT@" << Name;                                                     \
+    break;
+#include "clang/Basic/ZkFixedPointTypes.def"
         case BuiltinType::ShortAccum:
           Out << "@BT@ShortAccum"; break;
         case BuiltinType::Accum:

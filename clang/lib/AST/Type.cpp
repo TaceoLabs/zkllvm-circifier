@@ -3159,6 +3159,10 @@ StringRef BuiltinType::getName(const PrintingPolicy &Policy) const {
   case BuiltinType::FrontendId: \
     return Name;
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)                                   \
+  case Id:                                                                     \
+    return Name;
+#include "clang/Basic/ZkFixedPointTypes.def"
   }
 
   llvm_unreachable("Invalid builtin type.");
@@ -4293,6 +4297,8 @@ bool Type::canHaveNullability(bool ResultIfUnknown) const {
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   case BuiltinType::FrontendId:
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
     case BuiltinType::BuiltinFn:
     case BuiltinType::NullPtr:
     case BuiltinType::IncompleteMatrixIdx:
@@ -4596,6 +4602,18 @@ llvm::GaloisFieldKind Type::getLLVMFieldKind() const {
   case BuiltinType::FrontendId:                                                \
     return llvm::EnumId;
 #include "llvm/IR/GaloisFieldTypes.def"
+  default:
+    llvm_unreachable("Unknown field type!");
+  }
+}
+
+llvm::ZkFixedPointKind Type::getLLVMZkFixedPointKind() const {
+  assert(isZkFixedType());
+  switch (cast<BuiltinType>(CanonicalType)->getKind()) {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  case BuiltinType::FrontendId:                                                \
+    return llvm::EnumId;
+#include "llvm/IR/ZkFixedPointTypes.def"
   default:
     llvm_unreachable("Unknown field type!");
   }

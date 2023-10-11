@@ -449,6 +449,9 @@ void Sema::Initialize() {
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   addImplicitTypedef(Name, Context.SingletonId);
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)                                   \
+  addImplicitTypedef(Name, Context.SingletonId);
+#include "clang/Basic/ZkFixedPointTypes.def"
 
   if (Context.getTargetInfo().hasBuiltinMSVaList()) {
     DeclarationName MSVaList = &Context.Idents.get("__builtin_ms_va_list");

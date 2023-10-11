@@ -823,6 +823,12 @@ llvm::DIType *CGDebugInfo::CreateType(const BuiltinType *BT) {
       // TODO(maksenov): support debug info for field types
       break;
     }
+#define ZK_FIXED_TYPE(Name, Id, SingletoneId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
+    {
+      // TODO: support debug info for zk fixed point types
+      break;
+    }
   case BuiltinType::UChar:
   case BuiltinType::Char_U:
     Encoding = llvm::dwarf::DW_ATE_unsigned_char;

@@ -1632,6 +1632,8 @@ bool CursorVisitor::VisitBuiltinTypeLoc(BuiltinTypeLoc TL) {
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   case BuiltinType::FrontendId:
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
 #define BUILTIN_TYPE(Id, SingletonId)
 #define SIGNED_TYPE(Id, SingletonId) case BuiltinType::Id:
 #define UNSIGNED_TYPE(Id, SingletonId) case BuiltinType::Id:

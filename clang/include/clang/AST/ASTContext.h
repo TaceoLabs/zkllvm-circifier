@@ -1132,6 +1132,10 @@ public:
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId)             \
   CanQualType SingletonId;
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) \
+  CanQualType SingletonId;
+#include "clang/Basic/ZkFixedPointTypes.def"
+
 
   // Types for deductions in C++0x [stmt.ranged]'s desugaring. Built on demand.
   mutable QualType AutoDeductTy;     // Deduction against 'auto'.

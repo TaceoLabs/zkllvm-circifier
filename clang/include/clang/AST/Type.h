@@ -2106,8 +2106,10 @@ public:
   bool isEnumeralType() const;
   bool isFieldType() const;
   bool isCurveType() const;
+  bool isZkFixedPointType() const;
 
   llvm::GaloisFieldKind getLLVMFieldKind() const;
+  llvm::ZkFixedPointKind getLLVMZkFixedPointKind() const;
 
   /// Determine whether this type is a scoped enumeration type.
   bool isScopedEnumeralType() const;
@@ -2649,6 +2651,8 @@ public:
 #include "clang/Basic/FieldTypes.def"
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) FrontendId,
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) Id,
+#include "clang/Basic/ZkFixedPointTypes.def"
 // All other builtin types
 #define BUILTIN_TYPE(Id, SingletonId) Id,
 #define LAST_BUILTIN_TYPE(Id) LastKind = Id,
@@ -2657,6 +2661,8 @@ public:
 // Markers:
 #define FIELD_TYPE_MARKER(Marker, Value) Marker = Value,
 #include "clang/Basic/FieldTypes.def"
+#define ZK_FIXED_TYPE_MARKER(Marker, Value) Marker = Value,
+#include "clang/Basic/ZkFixedPointTypes.def"
 #define CURVE_FRONTEND_FIRST(Id) CurveFirstType = Id,
 #define CURVE_FRONTEND_LAST(Id) CurveLastType = Id,
 #include "llvm/IR/EllipticCurveTypes.def"
@@ -7261,6 +7267,14 @@ inline bool Type::isCurveType() const {
   if (const auto *BT = dyn_cast<BuiltinType>(CanonicalType)) {
     return BT->getKind() >= BuiltinType::CurveFirstType &&
            BT->getKind() <= BuiltinType::CurveLastType;
+  }
+  return false;
+}
+
+inline bool Type::isZkFixedPointType() const {
+  if (const auto *BT = dyn_cast<BuiltinType>(CanonicalType)) {
+    return BT->getKind() >= BuiltinType::ZkFixedPointFirstType &&
+           BT->getKind() <= BuiltinType::ZkFixedPointLastType;
   }
   return false;
 }

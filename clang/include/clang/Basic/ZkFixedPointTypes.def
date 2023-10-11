@@ -1,0 +1,35 @@
+//===-- ZkFixedPointTypes.def - Metadata about Fixed Types -*- C++ -*-===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines the list of ZkFixedPoint Types
+//
+//  Custom code should define this macros:
+//
+//    ZK_FIXED_TYPE(Name, Id, SingletonId) - A type for Zk Fixed Points
+//    with a given Name
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef ZK_FIXED_TYPE
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)
+#endif
+
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  ZK_FIXED_TYPE(Name, FrontendId, FrontendId##Ty)
+#include "llvm/IR/ZkFixedPointTypes.def"
+
+#undef ZK_FIXED_TYPE
+
+#ifndef ZK_FIXED_TYPE_MARKER
+#define ZK_FIXED_TYPE_MARKER(Marker, Value)
+#endif
+
+ZK_FIXED_TYPE_MARKER(ZkFixedPointFirstType, FZkFixedPoint1616)
+ZK_FIXED_TYPE_MARKER(ZkFixedPointLastType, FZkFixedPoint1616)
+
+#undef ZK_FIXED_TYPE_MARKER

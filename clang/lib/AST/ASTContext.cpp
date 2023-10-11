@@ -1441,6 +1441,10 @@ void ASTContext::InitBuiltinTypes(const TargetInfo &Target,
   InitBuiltinType(SingletonId, BuiltinType::FrontendId);
 #include "llvm/IR/EllipticCurveTypes.def"
 
+#define ZK_FIXED_TYPE(Name, Id, SingletonId)                                   \
+  InitBuiltinType(SingletonId, BuiltinType::Id);
+#include "clang/Basic/ZkFixedPointTypes.def"
+
   // Builtin type for __objc_yes and __objc_no
   ObjCBuiltinBoolTy = (Target.useSignedCharForObjCBool() ?
                        SignedCharTy : BoolTy);
@@ -2277,6 +2281,13 @@ TypeInfo ASTContext::getTypeInfoImpl(const Type *T) const {
     break;                                                                     \
   }
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  case BuiltinType::FrontendId: {                                              \
+    uint64_t ByteWidth = (llvm::GetNumberBits(llvm::EnumId) + 7) / 8;          \
+    Width = Align = ByteWidth * 8;                                             \
+    break;                                                                     \
+  }
+#include "llvm/IR/ZkFixedPointTypes.def"
     }
     break;
   case Type::ObjCObjectPointer:
@@ -8057,6 +8068,8 @@ static char getObjCEncodingForPrimitiveType(const ASTContext *C,
 #define ELLIPTIC_CURVE_TYPE(Name, EnumId, SingletonId, FrontendId) \
   case BuiltinType::FrontendId:
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
       {
         DiagnosticsEngine &Diags = C->getDiagnostics();
         unsigned DiagID = Diags.getCustomDiagID(DiagnosticsEngine::Error,

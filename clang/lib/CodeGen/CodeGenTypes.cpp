@@ -341,6 +341,17 @@ static llvm::Type *getFieldTypeById(llvm::LLVMContext &Context, BuiltinType::Kin
     llvm_unreachable("Unknown field type!");
   }
 }
+static llvm::Type *getZkFixedPointTypeById(llvm::LLVMContext &Context,
+                                      BuiltinType::Kind id) {
+  switch (id) {
+#define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
+  case BuiltinType::FrontendId:                                                \
+    return llvm::ZkFixedPointType::get(Context, llvm::EnumId);
+#include "llvm/IR/ZkFixedPointTypes.def"
+  default:
+    llvm_unreachable("Unknown fixed type!");
+  }
+}
 
 llvm::Type *CodeGenTypes::ConvertFunctionTypeInternal(QualType QFT) {
   assert(QFT.isCanonical());
@@ -651,6 +662,10 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
   case BuiltinType::FrontendId:                                                \
       return llvm::EllipticCurveType::get(getLLVMContext(), llvm::EnumId);
 #include "llvm/IR/EllipticCurveTypes.def"
+#define ZK_FIXED_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
+#include "clang/Basic/ZkFixedPointTypes.def"
+      return getZkFixedPointTypeById(getLLVMContext(),
+                                cast<BuiltinType>(Ty)->getKind());
    case BuiltinType::Dependent:
 #define BUILTIN_TYPE(Id, SingletonId)
 #define PLACEHOLDER_TYPE(Id, SingletonId) \
