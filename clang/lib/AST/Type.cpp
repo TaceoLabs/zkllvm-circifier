@@ -4608,7 +4608,7 @@ llvm::GaloisFieldKind Type::getLLVMFieldKind() const {
 }
 
 llvm::ZkFixedPointKind Type::getLLVMZkFixedPointKind() const {
-  assert(isZkFixedType());
+  assert(isZkFixedPointType());
   switch (cast<BuiltinType>(CanonicalType)->getKind()) {
 #define ZK_FIXED_POINT_TYPE(Name, EnumId, SingletonId, FrontendId)             \
   case BuiltinType::FrontendId:                                                \

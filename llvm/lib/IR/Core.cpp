@@ -527,7 +527,7 @@ LLVMTypeKind LLVMGetTypeKind(LLVMTypeRef Ty) {
   case Type::EllipticCurveTyID:
     return LLVMEllipticCurveTypeKind;
   case Type::ZkFixedPointTyID:
-    return LLVMZKFixedTypeKind;
+    return LLVMZkFixedPointTypeKind;
   case Type::FunctionTyID:
     return LLVMFunctionTypeKind;
   case Type::StructTyID:

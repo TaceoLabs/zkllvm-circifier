@@ -379,6 +379,10 @@ ZkFixedPointType *ZkFixedPointType::get(LLVMContext &C, ZkFixedPointKind Kind) {
   }
 }
 
+unsigned ZkFixedPointType::getBitWidth() const {
+  return GetNumberBits(getFixedKind());
+}
+
 //===----------------------------------------------------------------------===//
 //                       FunctionType Implementation
 //===----------------------------------------------------------------------===//

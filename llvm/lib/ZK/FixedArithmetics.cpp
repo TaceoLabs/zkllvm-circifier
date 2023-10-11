@@ -7,7 +7,7 @@ namespace llvm {
 unsigned GetNumberBits(ZkFixedPointKind Kind) {
   switch (Kind) {
   case ZK_FIXED_POINT_16_16:
-    return 32;
+    return 32; // TODO: is this what we want?
   }
   llvm_unreachable("Unspecified fixed kind");
 }
