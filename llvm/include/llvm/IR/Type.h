@@ -4,7 +4,7 @@
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
-//===----------------------------------------------------------------------===//
+//===----------------------------------------------------------------------==/
 //
 // This file contains the declaration of the Type class.  For more "Type"
 // stuff, look in DerivedTypes.h.
@@ -190,7 +190,7 @@ public:
   /// Return true if this is one of the floating-point types
   bool isFloatingPointTy() const {
     return isIEEELikeFPTy() || getTypeID() == X86_FP80TyID ||
-           getTypeID() == PPC_FP128TyID;
+           getTypeID() == PPC_FP128TyID || isZkFixedPointTy();
   }
 
   /// Returns true if this is a floating-point type that is an unevaluated sum

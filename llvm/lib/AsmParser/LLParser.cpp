@@ -6334,6 +6334,9 @@ int LLParser::parseInstruction(Instruction *&Inst, BasicBlock *BB,
   case lltok::kw_fmul:
   case lltok::kw_fdiv:
   case lltok::kw_frem: {
+    // we define zk_fixedpoint type as float
+    // later when we add support for "real" floats
+    // we have to distinguish the type
     FastMathFlags FMF = EatFastMathFlagsIfPresent();
     int Res = parseArithmetic(Inst, PFS, KeywordVal, /*IsFP*/ true);
     if (Res != 0)
@@ -6969,6 +6972,7 @@ bool LLParser::parseUnaryOp(Instruction *&Inst, PerFunctionState &PFS,
   if (parseTypeAndValue(LHS, Loc, PFS))
     return true;
 
+
   bool Valid = IsFP ? LHS->getType()->isFPOrFPVectorTy()
                     : LHS->getType()->isIntOrIntVectorTy();
 
@@ -7098,11 +7102,12 @@ bool LLParser::parseArithmetic(Instruction *&Inst, PerFunctionState &PFS,
       parseValue(LHS->getType(), RHS, PFS))
     return true;
 
+
+
   bool Valid = IsFP ? LHS->getType()->isFPOrFPVectorTy()
                     : LHS->getType()->isIntOrIntVectorTy() ||
                           LHS->getType()->isFieldTy() ||
                           LHS->getType()->isCurveTy();
-
   if (!Valid)
     return error(Loc, "invalid operand type for instruction");
 
