@@ -15,6 +15,7 @@ unsigned GetNumberBits(ZkFixedPointKind Kind) {
 ZkFixedPoint FixedBinOp(ZkFixedOperation Op, const ZkFixedPoint &LHS,
                         const ZkFixedPoint &RHS) {
   assert(LHS.getKind() == RHS.getKind());
+  llvm_unreachable("TACEO TODO Do we need this?????");
   switch (LHS.getKind()) {
   case ZK_FIXED_POINT_16_16:
     // TODO: implement
