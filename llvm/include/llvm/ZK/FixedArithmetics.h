@@ -1,16 +1,16 @@
-#ifndef LLVM_ZK_FIELD_ARITHMETICS_H
-#define LLVM_ZK_FIELD_ARITHMETICS_H
+#ifndef LLVM_ZK_FIXED_ARITHMETICS_H
+#define LLVM_ZK_FIXED_ARITHMETICS_H
 
 #include "llvm/ADT/ZkFixedPoint.h"
 
 namespace llvm {
 
 enum ZkFixedOperation {
-  F_Add,
-  F_Sub,
-  F_Mul,
-  F_Div,
-  F_Rem,
+  Fix_Add,
+  Fix_Sub,
+  Fix_Mul,
+  Fix_Div,
+  Fix_Rem,
 };
 
 ZkFixedPoint FixedBinOp(ZkFixedOperation Op, const ZkFixedPoint &LHS,

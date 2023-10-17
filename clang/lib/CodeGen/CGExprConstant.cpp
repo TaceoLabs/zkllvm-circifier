@@ -2080,6 +2080,8 @@ llvm::Constant *ConstantEmitter::tryEmitPrivate(const APValue &Value,
     return llvm::ConstantInt::get(CGM.getLLVMContext(), Value.getInt());
   case APValue::Field:
     return llvm::ConstantField::get(llvm::GaloisFieldType::get(CGM.getLLVMContext(),DestType->getLLVMFieldKind()), Value.getField());
+  case APValue::ZKFixedPoint:
+    return llvm::ConstantZkFixedPoint::get(llvm::ZkFixedPointType::get(CGM.getLLVMContext(),DestType->getLLVMZkFixedPointKind()), Value.getZkFixedPoint());
   case APValue::FixedPoint:
     return llvm::ConstantInt::get(CGM.getLLVMContext(),
                                   Value.getFixedPoint().getValue());

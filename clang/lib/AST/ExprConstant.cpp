@@ -58,6 +58,7 @@
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/ZK/FieldArithmetics.h"
+#include "llvm/ZK/FixedArithmetics.h"
 #include <cstring>
 #include <functional>
 #include <optional>
@@ -73,6 +74,7 @@ using llvm::FixedPointSemantics;
 
 using llvm::Optional;
 using llvm::FieldElem;
+using llvm::ZkFixedPoint;
 
 namespace {
   struct LValue;
@@ -2520,6 +2522,7 @@ static bool HandleConversionToBool(const APValue &Val, bool &Result) {
     Result = Val.getMemberPointerDecl();
     return true;
   case APValue::Field:
+  case APValue::ZKFixedPoint:
   case APValue::Vector:
   case APValue::Array:
   case APValue::Struct:
@@ -2869,6 +2872,29 @@ static bool handleFieldFieldBinOp(EvalInfo &Info, const Expr *E, const FieldElem
       return false;
     }
     Result = llvm::FieldBinOp(llvm::F_Div, LHS, RHS); return true;
+  }
+}
+
+/// Perform the given binary operation for ZkFixedPoint elements.
+static bool handleZkFixedZkFixedBinOp(EvalInfo &Info, const Expr *E, const ZkFixedPoint &LHS,
+                              BinaryOperatorKind Opcode, ZkFixedPoint RHS,
+                              ZkFixedPoint &Result) {
+  switch (Opcode) {
+  default:
+    Info.FFDiag(E);
+    return false;
+  case BO_Add:
+    Result = llvm::FixedBinOp(llvm::Fix_Add, LHS, RHS); return true;
+  case BO_Sub:
+    Result = llvm::FixedBinOp(llvm::Fix_Sub, LHS, RHS); return true;
+  case BO_Mul:
+    Result = llvm::FixedBinOp(llvm::Fix_Mul, LHS, RHS);; return true;
+  case BO_Div:
+    if (RHS.isZero()) {
+      Info.FFDiag(E, diag::note_expr_divide_by_zero);
+      return false;
+    }
+    Result = llvm::FixedBinOp(llvm::Fix_Div, LHS, RHS); return true;
   }
 }
 
@@ -4386,6 +4412,8 @@ struct CompoundAssignSubobjectHandler {
       return found(Subobj.getInt(), SubobjType);
     case APValue::Field:
       return found(Subobj.getField(),SubobjType);
+    case APValue::ZKFixedPoint:
+      return found(Subobj.getZkFixedPoint(),SubobjType);
     case APValue::Float:
       return found(Subobj.getFloat(), SubobjType);
     case APValue::ComplexInt:
@@ -4458,6 +4486,22 @@ struct CompoundAssignSubobjectHandler {
 
     if (RHS.isField()) {
       return handleFieldFieldBinOp(Info, E, Value, Opcode, RHS.getField(), Value);
+    }
+
+    Info.FFDiag(E);
+    return false;
+  }
+  bool found(ZkFixedPoint &Value, QualType SubobjType) {
+    if (!checkConst(SubobjType))
+      return false;
+
+    if (!SubobjType->isZkFixedPointType()) {
+      Info.FFDiag(E);
+      return false;
+    }
+
+    if (RHS.isZkFixedPoint()) {
+      return handleZkFixedZkFixedBinOp(Info, E, Value, Opcode, RHS.getZkFixedPoint(), Value);
     }
 
     Info.FFDiag(E);
@@ -6965,6 +7009,7 @@ class APValueToBufferConverter {
       // FIXME: We should support these.
 
     case APValue::Field:
+    case APValue::ZKFixedPoint:
     case APValue::Union:
     case APValue::MemberPointer:
     case APValue::AddrLabelDiff: {

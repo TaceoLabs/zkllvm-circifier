@@ -18,6 +18,7 @@
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/FieldElem.h"
+#include "llvm/ADT/ZkFixedPoint.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -122,6 +123,7 @@ namespace clang {
 /// [Vector: N * APValue], [Array: N * APValue]
 class APValue {
   typedef llvm::APFixedPoint APFixedPoint;
+  typedef llvm::ZkFixedPoint ZkFixedPoint;
   typedef llvm::FieldElem FieldElem;
   typedef llvm::APSInt APSInt;
   typedef llvm::APFloat APFloat;
@@ -135,6 +137,7 @@ public:
     Field,
     Float,
     FixedPoint,
+    ZKFixedPoint,
     ComplexInt,
     ComplexFloat,
     LValue,
@@ -316,6 +319,9 @@ public:
   explicit APValue(FieldElem FE) : Kind(None) {
     MakeField(); setField(std::move(FE));
   }
+  explicit APValue(ZkFixedPoint FE) : Kind(None) {
+    MakeZkFixedPoint(); setZkFixedPoint(std::move(FE));
+  }
   explicit APValue(APFloat F) : Kind(None) {
     MakeFloat(); setFloat(std::move(F));
   }
@@ -398,6 +404,7 @@ public:
 
   bool isInt() const { return Kind == Int; }
   bool isField() const { return Kind == Field; }
+  bool isZkFixedPoint() const { return Kind == ZKFixedPoint; }
   bool isFloat() const { return Kind == Float; }
   bool isFixedPoint() const { return Kind == FixedPoint; }
   bool isComplexInt() const { return Kind == ComplexInt; }
@@ -434,6 +441,15 @@ public:
 
   const FieldElem &getField() const {
     return const_cast<APValue*>(this)->getField();
+  }
+
+  ZkFixedPoint &getZkFixedPoint() {
+    assert(isZkFixedPoint() && "Invalid accessor");
+    return *(ZkFixedPoint *)(char *)&Data;
+  }
+
+  const ZkFixedPoint &getZkFixedPoint() const {
+    return const_cast<APValue*>(this)->getZkFixedPoint();
   }
 
   /// Try to convert this value to an integral constant. This works if it's an
@@ -601,6 +617,10 @@ public:
     assert(isField() && "Invalid accessor");
     *(FieldElem *)(char *)&Data = std::move(FE);
   }
+  void setZkFixedPoint(ZkFixedPoint FP) {
+    assert(isZkFixedPoint() && "Invalid accessor");
+    *(ZkFixedPoint *)(char *)&Data = std::move(FP);
+  }
   void setFloat(APFloat F) {
     assert(isFloat() && "Invalid accessor");
     *(APFloat *)(char *)&Data = std::move(F);
@@ -651,6 +671,11 @@ private:
     assert(isAbsent() && "Bad state change");
     new ((void *)&Data) FieldElem();
     Kind = Field;
+  }
+  void MakeZkFixedPoint() {
+    assert(isAbsent() && "Bad state change");
+    new ((void *)&Data) ZkFixedPoint();
+    Kind = ZKFixedPoint;
   }
   void MakeFloat() {
     assert(isAbsent() && "Bad state change");

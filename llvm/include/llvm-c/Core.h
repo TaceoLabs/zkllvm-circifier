@@ -287,6 +287,7 @@ typedef enum {
   LLVMConstantPointerNullValueKind,
   LLVMConstantTokenNoneValueKind,
   LLVMConstantFieldValueKind,
+  LLVMConstantZkFixedPointValueKind,
 
   LLVMMetadataAsValueValueKind,
   LLVMInlineAsmValueKind,

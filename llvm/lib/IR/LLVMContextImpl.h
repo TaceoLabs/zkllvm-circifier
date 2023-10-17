@@ -27,6 +27,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/ZkFixedPoint.h"
 #include "llvm/BinaryFormat/Dwarf.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DebugInfoMetadata.h"
@@ -74,6 +75,7 @@ class ValueHandleBase;
 
 using DenseMapAPIntKeyInfo = DenseMapInfo<APInt>;
 using DenseMapFieldElemKeyInfo = DenseMapInfo<FieldElem>;
+using DenseMapZkFixedElemKeyInfo = DenseMapInfo<ZkFixedPoint>;
 
 struct DenseMapAPFloatKeyInfo {
   static inline APFloat getEmptyKey() { return APFloat(APFloat::Bogus(), 1); }
@@ -1458,6 +1460,9 @@ public:
   using FieldMapTy =
       DenseMap<FieldElem, std::unique_ptr<ConstantField>, DenseMapFieldElemKeyInfo>;
   FieldMapTy FieldConstants;
+  using ZkFixedMapTy =
+      DenseMap<ZkFixedPoint, std::unique_ptr<ConstantZkFixedPoint>, DenseMapZkFixedElemKeyInfo>;
+  ZkFixedMapTy ZkFixedPointConstants;
 
   FoldingSet<AttributeImpl> AttrsSet;
   FoldingSet<AttributeListImpl> AttrsLists;

@@ -26,6 +26,7 @@
 #include "llvm/ADT/FieldElem.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/ZkFixedPoint.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/OperandTraits.h"
@@ -269,6 +270,27 @@ public:
   FieldElem getValue() const;
   static bool classof(const Value *V) {
     return V->getValueID() == ConstantFieldVal;
+  }
+};
+
+class ConstantZkFixedPoint final : public ConstantData {
+  friend class Constant;
+
+  ZkFixedPoint Val;
+
+  ConstantZkFixedPoint(ZkFixedPointType *Ty, ZkFixedPoint Elem);
+
+  void destroyConstantImpl() {
+    llvm_unreachable("You can't ConstantField->destroyConstantImpl()!");
+  }
+
+public:
+  ConstantZkFixedPoint(const ConstantZkFixedPoint &) = delete;
+  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APInt V);
+  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, int64_t V);
+  ZkFixedPoint getValue() const;
+  static bool classof(const Value *V) {
+    return V->getValueID() == ConstantZkFixedPointVal;
   }
 };
 

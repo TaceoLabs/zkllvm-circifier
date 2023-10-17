@@ -322,6 +322,10 @@ APValue::APValue(const APValue &RHS) : Kind(None) {
     MakeField();
     setField(RHS.getField());
     break;
+  case ZKFixedPoint:
+    MakeZkFixedPoint();
+    setZkFixedPoint(RHS.getZkFixedPoint());
+    break;
   case Float:
     MakeFloat();
     setFloat(RHS.getFloat());
@@ -445,6 +449,8 @@ bool APValue::needsCleanup() const {
     return getInt().needsCleanup();
   case Field:
     return getField().needsCleanup();
+  case ZKFixedPoint:
+    return getZkFixedPoint().needsCleanup();
   case Float:
     return getFloat().needsCleanup();
   case FixedPoint:
@@ -580,6 +586,10 @@ void APValue::Profile(llvm::FoldingSetNodeID &ID) const {
 
   case Field:
     profileIntValue(ID, getField());
+    return;
+
+  case ZKFixedPoint:
+    profileIntValue(ID, getZkFixedPoint());
     return;
 
   case Float:
@@ -727,6 +737,9 @@ void APValue::printPretty(raw_ostream &Out, const PrintingPolicy &Policy,
     return;
   case APValue::Field:
     Out << getField();
+    return;
+  case APValue::ZKFixedPoint:
+    Out << getZkFixedPoint();
     return;
   case APValue::Float:
     Out << GetApproxValue(getFloat());
@@ -1133,6 +1146,7 @@ LinkageInfo LinkageComputer::getLVForValue(const APValue &V,
   case APValue::Indeterminate:
   case APValue::Int:
   case APValue::Field:
+  case APValue::ZKFixedPoint:
   case APValue::Float:
   case APValue::FixedPoint:
   case APValue::ComplexInt:

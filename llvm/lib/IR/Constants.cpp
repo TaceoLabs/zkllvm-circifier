@@ -359,6 +359,8 @@ Constant *Constant::getNullValue(Type *Ty) {
     return ConstantInt::get(Ty, 0);
   case Type::GaloisFieldTyID:
     return ConstantField::get(llvm::cast<GaloisFieldType>(Ty), APInt());
+  case Type::ZkFixedPointTyID:
+    return ConstantZkFixedPoint::get(llvm::cast<ZkFixedPointType>(Ty), APInt());
   case Type::HalfTyID:
   case Type::BFloatTyID:
   case Type::FloatTyID:
@@ -951,6 +953,32 @@ ConstantField *ConstantField::get(GaloisFieldType *Ty, int64_t V) {
 }
 
 FieldElem ConstantField::getValue() const {
+  return Val;
+}
+
+// Zk Fixed Point
+ConstantZkFixedPoint::ConstantZkFixedPoint(ZkFixedPointType *Ty, ZkFixedPoint V)
+    : ConstantData(Ty, ConstantZkFixedPointVal), Val(V) {}
+
+ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, APInt V) {
+  LLVMContextImpl *pImpl = Ty->getContext().pImpl;
+  if (V.isSingleWord()) {
+    // Use certain bit width for field constant
+    V = APInt(Ty->getBitWidth(), V.getZExtValue());
+  }
+  ZkFixedPoint Elem(Ty->getFixedKind(), V);
+  std::unique_ptr<ConstantZkFixedPoint> &Slot = pImpl->ZkFixedPointConstants[Elem];
+  if (!Slot) {
+    Slot.reset(new ConstantZkFixedPoint(Ty, Elem));
+  }
+  return Slot.get();
+}
+
+ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, int64_t V) {
+  return get(Ty, APInt(Ty->getBitWidth(), V));
+}
+
+ZkFixedPoint ConstantZkFixedPoint::getValue() const {
   return Val;
 }
 
