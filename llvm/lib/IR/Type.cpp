@@ -68,6 +68,7 @@ const fltSemantics &Type::getFltSemantics() const {
   case HalfTyID: return APFloat::IEEEhalf();
   case BFloatTyID: return APFloat::BFloat();
   case FloatTyID: return APFloat::IEEEsingle();
+  case ZkFixedPointTyID:
   case DoubleTyID: return APFloat::IEEEdouble();
   case X86_FP80TyID: return APFloat::x87DoubleExtended();
   case FP128TyID: return APFloat::IEEEquad();
@@ -80,7 +81,10 @@ bool Type::isIEEE() const {
   return APFloat::getZero(getFltSemantics()).isIEEE();
 }
 
-Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S) {
+Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S, bool FixedPoint) {
+  if (FixedPoint && &S != &APFloat::IEEEdouble()) {
+    llvm_unreachable("Should still be double for fixed point here");
+  }
   Type *Ty;
   if (&S == &APFloat::IEEEhalf())
     Ty = Type::getHalfTy(C);
@@ -89,7 +93,7 @@ Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S) {
   else if (&S == &APFloat::IEEEsingle())
     Ty = Type::getFloatTy(C);
   else if (&S == &APFloat::IEEEdouble())
-    Ty = Type::getDoubleTy(C);
+    Ty = FixedPoint ? Type::getFixedPointTy(C) : Type::getFloatTy(C);
   else if (&S == &APFloat::x87DoubleExtended())
     Ty = Type::getX86_FP80Ty(C);
   else if (&S == &APFloat::IEEEquad())
@@ -226,6 +230,7 @@ Type *Type::getLabelTy(LLVMContext &C) { return &C.pImpl->LabelTy; }
 Type *Type::getHalfTy(LLVMContext &C) { return &C.pImpl->HalfTy; }
 Type *Type::getBFloatTy(LLVMContext &C) { return &C.pImpl->BFloatTy; }
 Type *Type::getFloatTy(LLVMContext &C) { return &C.pImpl->FloatTy; }
+Type *Type::getFixedPointTy(LLVMContext &C) { return &C.pImpl->ZkFixedPoint1616Ty; }
 Type *Type::getDoubleTy(LLVMContext &C) { return &C.pImpl->DoubleTy; }
 Type *Type::getMetadataTy(LLVMContext &C) { return &C.pImpl->MetadataTy; }
 Type *Type::getTokenTy(LLVMContext &C) { return &C.pImpl->TokenTy; }

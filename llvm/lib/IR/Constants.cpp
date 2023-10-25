@@ -1080,16 +1080,15 @@ Constant *ConstantFP::getZeroValueForNegation(Type *Ty) {
 
 
 // ConstantFP accessors.
-ConstantFP* ConstantFP::get(LLVMContext &Context, const APFloat& V) {
+ConstantFP* ConstantFP::get(LLVMContext &Context, const APFloat& V, bool FixedPoint) {
   LLVMContextImpl* pImpl = Context.pImpl;
 
   std::unique_ptr<ConstantFP> &Slot = pImpl->FPConstants[V];
 
   if (!Slot) {
-    Type *Ty = Type::getFloatingPointTy(Context, V.getSemantics());
+    Type *Ty = Type::getFloatingPointTy(Context, V.getSemantics(), FixedPoint);
     Slot.reset(new ConstantFP(Ty, V));
   }
-
   return Slot.get();
 }
 
@@ -1613,6 +1612,7 @@ bool ConstantFP::isValueValidForType(Type *Ty, const APFloat& Val) {
     Val2.convert(APFloat::IEEEsingle(), APFloat::rmNearestTiesToEven, &losesInfo);
     return !losesInfo;
   }
+  case Type::ZkFixedPointTyID:
   case Type::DoubleTyID: {
     if (&Val2.getSemantics() == &APFloat::IEEEhalf() ||
         &Val2.getSemantics() == &APFloat::BFloat() ||

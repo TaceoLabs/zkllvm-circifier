@@ -477,6 +477,7 @@ public:
   static Type *getHalfTy(LLVMContext &C);
   static Type *getBFloatTy(LLVMContext &C);
   static Type *getFloatTy(LLVMContext &C);
+  static Type *getFixedPointTy(LLVMContext &C);
   static Type *getDoubleTy(LLVMContext &C);
   static Type *getMetadataTy(LLVMContext &C);
   static Type *getX86_FP80Ty(LLVMContext &C);
@@ -506,7 +507,7 @@ public:
     }
     llvm_unreachable("Unsupported type in Type::getScalarTy");
   }
-  static Type *getFloatingPointTy(LLVMContext &C, const fltSemantics &S);
+  static Type *getFloatingPointTy(LLVMContext &C, const fltSemantics &S,bool FixedPoint=false);
 
   //===--------------------------------------------------------------------===//
   // Convenience methods for getting pointer types with one of the above builtin
