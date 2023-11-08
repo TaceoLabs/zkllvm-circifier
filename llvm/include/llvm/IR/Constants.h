@@ -286,6 +286,7 @@ class ConstantZkFixedPoint final : public ConstantData {
 
 public:
   ConstantZkFixedPoint(const ConstantZkFixedPoint &) = delete;
+  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APFloat V);
   static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APInt V);
   static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, int64_t V);
   ZkFixedPoint getValue() const;

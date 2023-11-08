@@ -1388,6 +1388,13 @@ static void WriteConstantInternal(raw_ostream &Out, const Constant *CV,
     return;
   }
 
+  if (const ConstantZkFixedPoint *FP = dyn_cast<ConstantZkFixedPoint>(CV)) {
+    SmallString<40> Str;
+    FP->getValue().toString(Str, 16, false);
+    Out << "f0x" << Str;
+    return;
+  }
+
   if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
     const APFloat &APF = CFP->getValueAPF();
     if (&APF.getSemantics() == &APFloat::IEEEsingle() ||
