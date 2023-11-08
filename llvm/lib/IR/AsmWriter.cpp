@@ -1390,8 +1390,8 @@ static void WriteConstantInternal(raw_ostream &Out, const Constant *CV,
 
   if (const ConstantZkFixedPoint *FP = dyn_cast<ConstantZkFixedPoint>(CV)) {
     SmallString<40> Str;
-    FP->getValue().toString(Str, 16, false);
-    Out << "f0x" << Str;
+    FP->getValue().toString(Str, 10, false);
+    Out << Str;
     return;
   }
 
