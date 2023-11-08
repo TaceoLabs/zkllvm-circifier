@@ -32,6 +32,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/ZK/ZKEnums.h"
 #include <algorithm>
+#include <cstdint>
 
 using namespace llvm;
 using namespace PatternMatch;
@@ -980,27 +981,26 @@ ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, APInt V) {
 ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty,
                                                 APFloat V) {
 
-  double D;
+  uint64_t FixedPoint;
   switch (Ty->getFixedKind()) {
-    //TODO when we have the ZkFixedPointLib we want to get
+    // TODO when we have the ZkFixedPointLib we want to get
     //+-inf from the lib depending on kind
   case ZkFixedPointKind::ZK_FIXED_POINT_16_16: {
     if (V.isNegInfinity()) {
-      D = -1000;
+      FixedPoint = -100000 * (1ULL << 16);
     } else if (V.isInfinity()) {
-      D = 1000;
+      FixedPoint = 100000 * (1ULL << 16);
     } else {
       assert(!V.isNaN() && "NaN not supported for ZkFixedPoint");
-      D = V.convertToDouble();
+      FixedPoint = uint64_t(V.convertToDouble() * (1ULL << 16));
     }
-    D *= (1ULL << 16);
     break;
   }
   default:
     llvm_unreachable("Only zk1616 supported at the moment");
   }
   return ConstantZkFixedPoint::get(
-      Ty, APInt(Ty->getBitWidth(), static_cast<uint64_t>(D)));
+      Ty, APInt(Ty->getBitWidth(), FixedPoint));
 }
 
 ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty,
