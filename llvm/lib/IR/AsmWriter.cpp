@@ -1370,33 +1370,8 @@ static void WriteOptimizationInfo(raw_ostream &Out, const User *U) {
   }
 }
 
-static void WriteConstantInternal(raw_ostream &Out, const Constant *CV,
-                                  AsmWriterContext &WriterCtx) {
-  if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
-    if (CI->getType()->isIntegerTy(1)) {
-      Out << (CI->getZExtValue() ? "true" : "false");
-      return;
-    }
-    Out << CI->getValue();
-    return;
-  }
+static void printAPFloat(raw_ostream &Out, const APFloat &APF) {
 
-  if (const ConstantField *CF = dyn_cast<ConstantField>(CV)) {
-    SmallString<40> Str;
-    CF->getValue().toString(Str, 16, false);
-    Out << "f0x" << Str;
-    return;
-  }
-
-  if (const ConstantZkFixedPoint *FP = dyn_cast<ConstantZkFixedPoint>(CV)) {
-    SmallString<40> Str;
-    FP->getValue().toString(Str, 10, false);
-    Out << Str;
-    return;
-  }
-
-  if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
-    const APFloat &APF = CFP->getValueAPF();
     if (&APF.getSemantics() == &APFloat::IEEEsingle() ||
         &APF.getSemantics() == &APFloat::IEEEdouble()) {
       // We would like to output the FP constant value in exponential notation,
@@ -1484,6 +1459,34 @@ static void WriteConstantInternal(raw_ostream &Out, const Constant *CV,
                                   /*Upper=*/true);
     } else
       llvm_unreachable("Unsupported floating point type");
+    return;
+}
+
+static void WriteConstantInternal(raw_ostream &Out, const Constant *CV,
+                                  AsmWriterContext &WriterCtx) {
+  if (const ConstantInt *CI = dyn_cast<ConstantInt>(CV)) {
+    if (CI->getType()->isIntegerTy(1)) {
+      Out << (CI->getZExtValue() ? "true" : "false");
+      return;
+    }
+    Out << CI->getValue();
+    return;
+  }
+
+  if (const ConstantField *CF = dyn_cast<ConstantField>(CV)) {
+    SmallString<40> Str;
+    CF->getValue().toString(Str, 16, false);
+    Out << "f0x" << Str;
+    return;
+  }
+
+  if (const ConstantZkFixedPoint *ZkFixedPoint = dyn_cast<ConstantZkFixedPoint>(CV)) {
+    printAPFloat(Out, ZkFixedPoint->getValue().getValueAPF());
+    return;
+  }
+
+  if (const ConstantFP *CFP = dyn_cast<ConstantFP>(CV)) {
+    printAPFloat(Out, CFP->getValueAPF());
     return;
   }
 

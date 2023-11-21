@@ -12,6 +12,7 @@
 
 #include "llvm/IR/Constants.h"
 #include "LLVMContextImpl.h"
+#include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
@@ -363,7 +364,7 @@ Constant *Constant::getNullValue(Type *Ty) {
   case Type::GaloisFieldTyID:
     return ConstantField::get(llvm::cast<GaloisFieldType>(Ty), APInt());
   case Type::ZkFixedPointTyID:
-    return ConstantZkFixedPoint::get(llvm::cast<ZkFixedPointType>(Ty), APInt());
+    return ConstantZkFixedPoint::get(llvm::cast<ZkFixedPointType>(Ty), APFloat(0.0));
   case Type::HalfTyID:
   case Type::BFloatTyID:
   case Type::FloatTyID:
@@ -959,16 +960,16 @@ ConstantField *ConstantField::get(GaloisFieldType *Ty, int64_t V) {
 
 FieldElem ConstantField::getValue() const { return Val; }
 
+
 // Zk Fixed Point
 ConstantZkFixedPoint::ConstantZkFixedPoint(ZkFixedPointType *Ty, ZkFixedPoint V)
     : ConstantData(Ty, ConstantZkFixedPointVal), Val(V) {}
 
-ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, APInt V) {
-  LLVMContextImpl *pImpl = Ty->getContext().pImpl;
-  if (V.isSingleWord()) {
-    // Use certain bit width for field constant
-    V = APInt(Ty->getBitWidth(), V.getZExtValue());
-  }
+
+ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty,
+                                                APFloat V) {
+  LLVMContext &Context = Ty->getContext();
+  LLVMContextImpl *pImpl = Context.pImpl;
   ZkFixedPoint Elem(Ty->getFixedKind(), V);
   std::unique_ptr<ConstantZkFixedPoint> &Slot =
       pImpl->ZkFixedPointConstants[Elem];
@@ -978,35 +979,15 @@ ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, APInt V) {
   return Slot.get();
 }
 
-ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty,
-                                                APFloat V) {
-
-  uint64_t FixedPoint;
-  switch (Ty->getFixedKind()) {
-    // TODO when we have the ZkFixedPointLib we want to get
-    //+-inf from the lib depending on kind
-  case ZkFixedPointKind::ZK_FIXED_POINT_16_16: {
-    if (V.isNegInfinity()) {
-      FixedPoint = -100000 * (1ULL << 16);
-    } else if (V.isInfinity()) {
-      FixedPoint = 100000 * (1ULL << 16);
-    } else {
-      assert(!V.isNaN() && "NaN not supported for ZkFixedPoint");
-      FixedPoint = uint64_t(V.convertToDouble() * (1ULL << 16));
-    }
-    break;
-  }
-  default:
-    llvm_unreachable("Only zk1616 supported at the moment");
-  }
-  return ConstantZkFixedPoint::get(
-      Ty, APInt(Ty->getBitWidth(), FixedPoint));
+ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty, const ZkFixedPoint &V) {
+  return ConstantZkFixedPoint::get(Ty, V.getValueAPF());
 }
-
+/*
 ConstantZkFixedPoint *ConstantZkFixedPoint::get(ZkFixedPointType *Ty,
                                                 int64_t V) {
   return get(Ty, APInt(Ty->getBitWidth(), V));
 }
+*/
 
 ZkFixedPoint ConstantZkFixedPoint::getValue() const { return Val; }
 
@@ -1107,14 +1088,13 @@ Constant *ConstantFP::getZeroValueForNegation(Type *Ty) {
 }
 
 // ConstantFP accessors.
-ConstantFP *ConstantFP::get(LLVMContext &Context, const APFloat &V,
-                            bool FixedPoint) {
+ConstantFP *ConstantFP::get(LLVMContext &Context, const APFloat &V) {
   LLVMContextImpl *pImpl = Context.pImpl;
 
   std::unique_ptr<ConstantFP> &Slot = pImpl->FPConstants[V];
 
   if (!Slot) {
-    Type *Ty = Type::getFloatingPointTy(Context, V.getSemantics(), FixedPoint);
+    Type *Ty = Type::getFloatingPointTy(Context, V.getSemantics());
     Slot.reset(new ConstantFP(Ty, V));
   }
   return Slot.get();

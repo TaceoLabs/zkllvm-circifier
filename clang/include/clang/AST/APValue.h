@@ -23,6 +23,7 @@
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/AlignOf.h"
+#include "llvm/ZK/ZKEnums.h"
 
 namespace clang {
 namespace serialization {
@@ -674,6 +675,7 @@ private:
   }
   void MakeZkFixedPoint() {
     assert(isAbsent() && "Bad state change");
+    //TACEO_TODO we need to check kind?
     new ((void *)&Data) ZkFixedPoint();
     Kind = ZKFixedPoint;
   }

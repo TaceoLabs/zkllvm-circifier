@@ -589,7 +589,7 @@ void APValue::Profile(llvm::FoldingSetNodeID &ID) const {
     return;
 
   case ZKFixedPoint:
-    profileIntValue(ID, getZkFixedPoint());
+    profileIntValue(ID, getZkFixedPoint().bitcastToAPInt());
     return;
 
   case Float:
@@ -739,7 +739,7 @@ void APValue::printPretty(raw_ostream &Out, const PrintingPolicy &Policy,
     Out << getField();
     return;
   case APValue::ZKFixedPoint:
-    Out << getZkFixedPoint();
+    Out << GetApproxValue(getZkFixedPoint().getValueAPF());
     return;
   case APValue::Float:
     Out << GetApproxValue(getFloat());

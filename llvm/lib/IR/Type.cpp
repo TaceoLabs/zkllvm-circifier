@@ -81,10 +81,7 @@ bool Type::isIEEE() const {
   return APFloat::getZero(getFltSemantics()).isIEEE();
 }
 
-Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S, bool FixedPoint) {
-  if (FixedPoint && &S != &APFloat::IEEEdouble()) {
-    llvm_unreachable("Should still be double for fixed point here");
-  }
+Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S) {
   Type *Ty;
   if (&S == &APFloat::IEEEhalf())
     Ty = Type::getHalfTy(C);
@@ -93,7 +90,7 @@ Type *Type::getFloatingPointTy(LLVMContext &C, const fltSemantics &S, bool Fixed
   else if (&S == &APFloat::IEEEsingle())
     Ty = Type::getFloatTy(C);
   else if (&S == &APFloat::IEEEdouble())
-    Ty = FixedPoint ? Type::getFixedPointTy(C) : Type::getFloatTy(C);
+    Ty =  Type::getFloatTy(C);
   else if (&S == &APFloat::x87DoubleExtended())
     Ty = Type::getX86_FP80Ty(C);
   else if (&S == &APFloat::IEEEquad())
@@ -177,6 +174,8 @@ TypeSize Type::getPrimitiveSizeInBits() const {
   case Type::X86_AMXTyID: return TypeSize::Fixed(8192);
   case Type::IntegerTyID:
     return TypeSize::Fixed(cast<IntegerType>(this)->getBitWidth());
+  case Type::ZkFixedPointTyID:
+    return TypeSize::Fixed(cast<ZkFixedPointType>(this)->getBitWidth());
   case Type::FixedVectorTyID:
   case Type::ScalableVectorTyID: {
     const VectorType *VTy = cast<VectorType>(this);

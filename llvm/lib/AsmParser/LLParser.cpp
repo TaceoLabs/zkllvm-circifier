@@ -5731,7 +5731,11 @@ bool LLParser::convertValIDToValue(Type *Ty, ValID &ID, Value *&V,
                                          ID.APFloatVal.isNegative(), &Payload);
       }
     }
-    V = ConstantFP::get(Context, ID.APFloatVal, Ty->isZkFixedPointTy());
+    if (Ty->isZkFixedPointTy()) {
+      V = ConstantZkFixedPoint::get(cast<ZkFixedPointType>(Ty), ID.APFloatVal);
+    } else {
+      V = ConstantFP::get(Context, ID.APFloatVal);
+    }
 
     if (V->getType() != Ty)
       return error(ID.Loc, "floating point constant does not have type '" +

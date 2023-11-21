@@ -286,9 +286,11 @@ class ConstantZkFixedPoint final : public ConstantData {
 
 public:
   ConstantZkFixedPoint(const ConstantZkFixedPoint &) = delete;
+  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, const ZkFixedPoint &V);
   static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APFloat V);
-  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APInt V);
-  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, int64_t V);
+  // static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APInt V);
+  // static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, APSInt V);
+//  static ConstantZkFixedPoint *get(ZkFixedPointType *Ty, int64_t V);
   ZkFixedPoint getValue() const;
   static bool classof(const Value *V) {
     return V->getValueID() == ConstantZkFixedPointVal;
@@ -326,7 +328,7 @@ public:
   static Constant *get(Type *Ty, const APFloat &V);
 
   static Constant *get(Type *Ty, StringRef Str);
-  static ConstantFP *get(LLVMContext &Context, const APFloat &V, bool FixedPoint = false);
+  static ConstantFP *get(LLVMContext &Context, const APFloat &V);
   static Constant *getNaN(Type *Ty, bool Negative = false,
                           uint64_t Payload = 0);
   static Constant *getQNaN(Type *Ty, bool Negative = false,

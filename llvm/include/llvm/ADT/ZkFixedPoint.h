@@ -15,42 +15,60 @@
 #ifndef LLVM_ADT_ZKFIXEDPOINT_H
 #define LLVM_ADT_ZKFIXEDPOINT_H
 
-#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ZK/ZKEnums.h"
+#include <cassert>
 
 namespace llvm {
 
 /// ZK Fixed Point element.
-class [[nodiscard]] ZkFixedPoint : public APInt {
+class [[nodiscard]] ZkFixedPoint {
+
+  APFloat F;
   ZkFixedPointKind Kind;
+  size_t BitWidth;
 
 public:
-  ZkFixedPoint() : APInt(), Kind(static_cast<ZkFixedPointKind>(0)) {}
-  ZkFixedPoint(ZkFixedPointKind k, APInt v)
-      : APInt(v.zext(GetNumberBits(k) + 1)), Kind(k) {} // +1 for sign
+  //  ZkFixedPoint() : APFloat(fltSemantics.),
+  //  Kind(static_cast<ZkFixedPointKind>(0)) {}
+  ZkFixedPoint()
+      : F(0.0), Kind(ZkFixedPointKind::ZK_FIXED_POINT_16_16), BitWidth(64) {}
+  ZkFixedPoint(ZkFixedPointKind K, APFloat F) : F(F), Kind(K), BitWidth(64) {
+    // assert(&F.getSemantics() == &F.IEEEdouble() &&
+    //        "FixedPoints must be represented as Double");
+  }
 
   ZkFixedPointKind getKind() const { return Kind; }
 
   ZkFixedPoint &operator+=(const ZkFixedPoint &other);
 
-  uint64_t *getData() const {
-    assert(!isSingleWord());
-    return U.pVal;
+  size_t getBitWidth() const { return BitWidth; }
+
+  double getValue() {
+    // assert(&F.getSemantics() == &F.IEEEdouble() &&
+    // "FixedPoints must be represented as Double");
+    return F.convertToDouble();
   }
+
+  const APFloat &getValueAPF() const { return F; }
+
+  bool needsCleanup() const { return F.needsCleanup(); }
+
+  APInt bitcastToAPInt() const { return F.bitcastToAPInt(); }
+
+  bool isZero() { return F.isZero(); }
 
 private:
   static inline ZkFixedPoint getEmptyKey() {
-    ZkFixedPoint key;
+    ZkFixedPoint key(ZkFixedPointKind::ZK_FIXED_POINT_16_16, APFloat(0.0));
     key.BitWidth = 0;
-    key.U.VAL = ~0ULL;
     return key;
   }
 
   static inline ZkFixedPoint getTombstoneKey() {
-    ZkFixedPoint key;
-    key.BitWidth = 0;
-    key.U.VAL = ~1ULL;
+    ZkFixedPoint key(ZkFixedPointKind::ZK_FIXED_POINT_16_16, APFloat(0.0));
+    key.BitWidth = 1;
     return key;
   }
 
@@ -73,13 +91,12 @@ template <> struct DenseMapInfo<ZkFixedPoint, void> {
   }
 
   static unsigned getHashValue(const ZkFixedPoint &Key) {
-    return hash_combine(Key.getKind(),
-                        DenseMapInfo<APInt, void>::getHashValue(Key));
+    return hash_combine(Key.getKind(), hash_value(Key.F));
   }
 
   static bool isEqual(const ZkFixedPoint &LHS, const ZkFixedPoint &RHS) {
     return LHS.getBitWidth() == RHS.getBitWidth() &&
-           LHS.getKind() == RHS.getKind() && LHS == RHS;
+           LHS.getKind() == RHS.getKind() && LHS.F == RHS.F;
   }
 };
 } // namespace llvm
